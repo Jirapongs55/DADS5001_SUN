@@ -4,10 +4,21 @@ import numpy as np
 
 st.title('Uber pickups in NYC by JS V2')
 
-DATE_COLUMN = 'date/time'
-DATA_URL = ('https://s3-us-west-2.amazonaws.com/'
-            'streamlit-demo-data/uber-raw-data-sep14.csv.gz')
+# Install dependencies as needed:
+# pip install kagglehub[pandas-datasets]
+import kagglehub
+from kagglehub import KaggleDatasetAdapter
 
+# Set the path to the file you'd like to load
+file_path = "directory.csv"
+
+# Load the latest version
+df = kagglehub.load_dataset(
+  KaggleDatasetAdapter.PANDAS,
+  "starbucks/store-locations",
+  file_path)
+
+st.write("First 5 records", df.head())
 @st.cache_data
 def load_data(nrows):
     data = pd.read_csv(DATA_URL, nrows=nrows)
@@ -35,4 +46,5 @@ filtered_data = data[data[DATE_COLUMN].dt.hour == hour_to_filter]
 st.subheader('Map of all pickups at %s:00' % hour_to_filter)
 
 st.map(filtered_data)
+
 
