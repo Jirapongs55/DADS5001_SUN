@@ -1,27 +1,27 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-
-st.title('Uber pickups in NYC by JS V2')
-
-# Install dependencies as needed:
-# pip install kagglehub[pandas-datasets]
 import kagglehub
-from kagglehub import KaggleDatasetAdapter
+import os
 
-# Set the path to the file you'd like to load
-file_path = "directory.csv"
+# Download latest version
+path = kagglehub.dataset_download("starbucks/store-locations")
 
-# Load the latest version
-df = kagglehub.load_dataset(
-  KaggleDatasetAdapter.PANDAS,
-  "starbucks/store-locations",
-  file_path)
+print("Path to dataset files:", path)
 
-st.write("First 5 records", df.head())
+
+for file in os.listdir(path):
+    if file.endwith(".csv"):
+        data_path = os.path.join(path, file)
+        break
+    
+df = pd.read_csv(data_path)
+
+st.title('Starbucks Locations Worldwide by JS')
+
 @st.cache_data
 def load_data(nrows):
-    data = pd.read_csv(DATA_URL, nrows=nrows)
+    data = df
     lowercase = lambda x: str(x).lower()
     data.rename(lowercase, axis='columns', inplace=True)
     data[DATE_COLUMN] = pd.to_datetime(data[DATE_COLUMN])
@@ -44,7 +44,4 @@ hour_to_filter = st.slider('hour', 0, 23, 17)
 filtered_data = data[data[DATE_COLUMN].dt.hour == hour_to_filter]
 
 st.subheader('Map of all pickups at %s:00' % hour_to_filter)
-
 st.map(filtered_data)
-
-
